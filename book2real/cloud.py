@@ -200,6 +200,11 @@ def deepseek(messages: list[dict], *, model: str | None = None, temperature: flo
         text = res["choices"][0]["message"]["content"] or ""
     except Exception:                              # noqa: BLE001
         raise CloudError(f"DeepSeek 返回不符合预期：{json.dumps(res, ensure_ascii=False)[:300]}")
+    # 兼容 MiniMax 等带 thinking 的 OpenAI 兼容模型：去掉 <think>…</think> 再交给 json 解析
+    import re as _re
+    text = _re.sub(r"^\s*<think>.*?</think>\s*", "", text, flags=_re.S).strip()
+    if text.startswith("```"):
+        text = _re.sub(r"^```[a-zA-Z]*\s*|\s*```$", "", text).strip()
     return {"text": text, "usage": usage, "model": model, "cny": round(cny, 4)}
 
 
@@ -260,7 +265,10 @@ def seedance(prompt: str, out: str | Path, *, image: str | Path | None = None,
         content.append({"type": "image_url", "image_url": {
             "url": f"data:{mime};base64,{base64.b64encode(img.read_bytes()).decode()}"}})
     payload = {"model": model, "content": content, "duration": int(seconds),
-               "resolution": resolution, "ratio": ratio, "watermark": bool(watermark)}
+               "resolution": resolution, "watermark": bool(watermark)}
+    if not image:
+        # 首帧图生视频时 ratio 由首帧决定，传了反而 400 InvalidParameter.TaskTypeConstraint
+        payload["ratio"] = ratio
     cost = c["price_video_s"] * int(seconds)
     _guard(cost, env)
     if dry_run:

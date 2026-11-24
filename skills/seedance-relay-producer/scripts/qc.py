@@ -219,6 +219,16 @@ def build_contact_sheet(
     imwrite_bgr(dest_path, sheet)
 
 
+def _json_default(value: Any):
+    if isinstance(value, np.integer):
+        return int(value)
+    if isinstance(value, np.floating):
+        return float(value)
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
 def inspect_single_page(
     pstate: Dict[str, Any],
     out_dir: Path,
@@ -580,7 +590,7 @@ def inspect_single_page(
         "contact_sheet": str(contact_path),
     }
 
-    (page_dir / "qc.json").write_text(json.dumps(qc_result, ensure_ascii=False, indent=2), encoding="utf-8")
+    (page_dir / "qc.json").write_text(json.dumps(qc_result, ensure_ascii=False, indent=2, default=_json_default), encoding="utf-8")
     return qc_result
 
 

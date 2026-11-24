@@ -2,6 +2,10 @@
 
 > **交付路径已定**：成片只能由 Seedance 生成，2.5D 成片不得提交。见 [`docs/CONSTRAINTS.md`](CONSTRAINTS.md)。
 > 本文件里任何"退回 2.5D"的旧说法作废。
+>
+> **2026-11-24 实测更正**：§5/§6.1 的“1.8 元/10s @720p、6 本约 130 元”是配置表估值；
+> B 链六条 `cost.csv` 实测 **480p/5s = ¥5.00**，且 S1 本地 Telea 去字会把角色涂坏。
+> 详见 [`PIPELINE_REALITY_CHECK_20261124.md`](PIPELINE_REALITY_CHECK_20261124.md)。
 
 > 2026-11-22，分支 `feat/skills-official-align`。对象是 `skills/` 下五个 skill 与
 > `docs/前端skill-yhl.docx` 里那 5 条目标。所有数字都是本机实跑，命令见文末。

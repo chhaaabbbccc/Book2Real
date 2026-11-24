@@ -420,7 +420,17 @@ def load_pipeline_state(out_dir: Path) -> Dict[str, Any]:
     return {"pages": {}, "relay_edges": [], "meta": {}}
 
 
+def _json_default(value: Any):
+    if isinstance(value, np.integer):
+        return int(value)
+    if isinstance(value, np.floating):
+        return float(value)
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    raise TypeError(f"Object of type {type(value).__name__} is not JSON serializable")
+
+
 def save_pipeline_state(out_dir: Path, state: Dict[str, Any]) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     state_file = out_dir / "pipeline_state.json"
-    state_file.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    state_file.write_text(json.dumps(state, ensure_ascii=False, indent=2, default=_json_default), encoding="utf-8")
